@@ -35,7 +35,7 @@ teardown() {
     run ../bin/xspec.sh
 	echo $output
     [ "$status" -eq 1 ]
-    [ "${lines[2]}" = "Usage: xspec [-t|-q|-s|-c|-j|-h] filename [coverage]" ]
+    [ "${lines[2]}" = "Usage: xspec [-t|-q|-s|-c|-j|-h|-d DEST] filename [coverage]" ]
 }
 
 
@@ -60,6 +60,22 @@ teardown() {
 	echo $output
     [ "$status" -eq 1 ]
     [ "${lines[1]}" = "-t and -q are mutually exclusive" ]
+}
+
+
+@test "invoking xspec -d with a file prints error message" {
+    run ../bin/xspec.sh -d ../README.md
+	echo $output
+    [ "$status" -eq 1 ]
+    [ "${lines[1]}" = "DEST exists but is not a directory." ]
+}
+
+
+@test "invoking xspec.sh -d with no DEST prints error message" {
+		run ../bin/xspec.sh -d -t ../tutorial/escape-for-regex.xspec
+	echo $output
+    [ "$status" -eq 1 ]
+    [ "${lines[1]}" = "DEST must not start with '-'." ]
 }
 
 
@@ -202,11 +218,28 @@ teardown() {
 }
 
 
+@test "invoking xspec.sh with -d /tmp generates files inside /tmp" {
+		run ../bin/xspec.sh -d /tmp ../tutorial/escape-for-regex.xspec
+	echo $output
+    [ "$status" -eq 0 ]
+    [ "${lines[18]}" = "Report available at /tmp/escape-for-regex-result.html" ]
+}
+
+
 @test "invoking xspec.sh without TEST_DIR generates files in default location" {
     run ../bin/xspec.sh ../tutorial/escape-for-regex.xspec
 	echo $output
     [ "$status" -eq 0 ]
     [ "${lines[18]}" = "Report available at ../tutorial/xspec/escape-for-regex-result.html" ]
+}
+
+
+@test "invoking xspec.sh with -d /tmp and TEST_DIR set externally generates files inside /tmp" {
+    export TEST_DIR=/wrong_tmp
+		run ../bin/xspec.sh -d /tmp ../tutorial/escape-for-regex.xspec
+	echo $output
+    [ "$status" -eq 0 ]
+    [ "${lines[18]}" = "Report available at /tmp/escape-for-regex-result.html" ]
 }
 
 

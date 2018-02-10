@@ -36,16 +36,17 @@ usage() {
         echo "$1"
         echo;
     fi
-    echo "Usage: xspec [-t|-q|-s|-c|-j|-h] filename [coverage]"
+    echo "Usage: xspec [-t|-q|-s|-c|-j|-h|--output directory] filename [coverage]"
     echo
-    echo "  filename   the XSpec document"
-    echo "  -t         test an XSLT stylesheet (the default)"
-    echo "  -q         test an XQuery module (mutually exclusive with -t and -s)"
-    echo "  -s         test a Schematron schema (mutually exclusive with -t and -q)"
-    echo "  -c         output test coverage report"
-    echo "  -j         output JUnit report"
-    echo "  -h         display this help message"
-    echo "  coverage   deprecated, use -c instead"
+    echo "  filename        the XSpec document"
+    echo "  -t              test an XSLT stylesheet (the default)"
+    echo "  -q              test an XQuery module (mutually exclusive with -t and -s)"
+    echo "  -s              test a Schematron schema (mutually exclusive with -t and -q)"
+    echo "  -c              output test coverage report"
+    echo "  -j              output JUnit report"
+    echo "  -h              display this help message"
+    echo "  --output dir    write results to directory 'dir'"
+    echo "  coverage        deprecated, use -c instead"
 }
 
 die() {
@@ -200,6 +201,18 @@ while echo "$1" | grep -- ^- >/dev/null 2>&1; do
 			    exit 1
 			fi
             JUNIT=1;;
+        #individual output dir for test-result
+        --output)
+            shift;
+      if [[ $1 == -* ]]; then
+        echo "The result output dir may not start with '-'. Was: $1"
+          exit 1
+      fi
+      if [[ -e $1 && ! -d $1 ]]; then
+        echo "The result output target exists but is not a directory. Was: $1"
+          exit 1
+      fi
+            TEST_DIR=$1;;
         # Help!
         -h)
             usage

@@ -205,11 +205,11 @@ while echo "$1" | grep -- ^- >/dev/null 2>&1; do
         -d)
             shift;
       if [[ $1 == -* ]]; then
-        echo "DEST may not start with '-'. Was: $1"
+        echo "DEST must not start with '-'."
           exit 1
       fi
       if [[ -e $1 && ! -d $1 ]]; then
-        echo "DEST exists but is not a directory. Was: $1"
+        echo "DEST exists but is not a directory."
           exit 1
       fi
             TEST_DIR=$1;;

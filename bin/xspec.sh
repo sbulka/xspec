@@ -74,7 +74,8 @@ else
     echo Saxon script not found, invoking JVM directly instead.
     echo
     xslt() {
-        java -cp "$CP" net.sf.saxon.Transform "$@"
+        echo     java -cp "$CP" net.sf.saxon.Transform "$@" -catalog:"${XML_CATALOG_FILE}"
+        java -cp "$CP" net.sf.saxon.Transform "$@" -catalog:"${XML_CATALOG_FILE}"
     }
     xquery() {
         java -cp "$CP" net.sf.saxon.Query "$@"
@@ -147,6 +148,9 @@ if test -z "$SAXON_CP"; then
 fi
 
 CP="${SAXON_CP}${CP_DELIM}${XSPEC_HOME}/java/"
+if test ! -z ${XML_RESOLVER_CP}; then
+    CP="${CP}${CP_DELIM}${XML_RESOLVER_CP}"
+fi
 
 ##
 ## options ###################################################################
@@ -154,6 +158,9 @@ CP="${SAXON_CP}${CP_DELIM}${XSPEC_HOME}/java/"
 
 while echo "$1" | grep -- ^- >/dev/null 2>&1; do
     case "$1" in
+        -catalog)
+            shift
+            XML_CATALOG_FILE=$1;;
         # XSLT
         -t)
             if test -n "$XQUERY"; then
